@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <vector>
 #include <std_micro_service.hpp>
 
 typedef struct 
@@ -32,4 +33,6 @@ class UserManager
    void signUp(const UserInformation & userInfo);
    
    bool signOn(const std::string email,const std::string password, UserInformation& userInfo);
+
+   std::vector<UserInformation> getUsers();
 };

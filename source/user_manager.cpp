@@ -28,3 +28,14 @@ bool UserManager::signOn(const std::string email, const std::string password, Us
    }
    return false;
 }
+
+std::vector<UserInformation> UserManager::getUsers()
+{
+   std::vector<UserInformation> users;
+      for(auto const& kv : usersDB)
+      {
+         users.push_back(kv.second);
+      }
+
+   return users;
+}

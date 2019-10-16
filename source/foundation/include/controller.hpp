@@ -5,7 +5,7 @@
 using namespace web;
 using namespace http;
 
-namespace cfx {
+namespace kj {
 
    /*!
     * Dispatcher class represents the basic interface for a 

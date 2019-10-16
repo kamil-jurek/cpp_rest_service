@@ -2,6 +2,7 @@
 #include "microsvc_controller.hpp"
 
 #include "user_manager.hpp"
+#include "kjUtils.hpp"
 
 #include <tuple>
 #include <chrono>
@@ -23,13 +24,8 @@ void MicroserviceController::handleGet(http_request message)
 {
     auto path = requestPath(message);
     
-    std::cout << "KJ: MicroserviceController::handleGet\n";
-    std::cout << "Request path: ";
-    for(const auto& elem : path)
-    {
-        std::cout << elem << " ";
-    }
-    std::cout << "\n\n";
+    TRACE("MicroserviceController::handleGet");
+    TRACE("Request path: ", requestPathString(message));
 
     if (!path.empty()) 
     {
@@ -45,7 +41,9 @@ void MicroserviceController::handleGet(http_request message)
             message.reply(status_codes::OK, response);
         }
     
-        else if (path[0] == "users" && path[1] == "signon") 
+        else if (path.size() == 2 &&
+                 path[0] == "users" && 
+                 path[1] == "signon") 
         {   
             std::cout << "KJ: 0";
             pplx::create_task([=]() -> std::tuple<bool, UserInformation> 
@@ -115,6 +113,28 @@ void MicroserviceController::handleGet(http_request message)
                 }
             });
         }
+         else if (path.size() == 1 && path[0] == "users")
+        {
+            pplx::create_task([=]() 
+            {
+                auto response = json::value::object();
+                std::vector<web::json::value> users;
+                UserManager userManager;
+
+                auto usersVector = userManager.getUsers();
+                for(auto const& userDb : usersVector)
+                {
+                    json::value user;
+                    user["email"] = json::value::string(userDb.email);
+                    user["lastName"] = json::value::string(userDb.lastName); 
+
+                    users.push_back(user);
+                }
+                response["users"] = json::value::array(users);
+
+                message.reply(status_codes::OK, response);  
+            });      
+        }
    }
 
     else {
@@ -131,11 +151,16 @@ void MicroserviceController::handlePut(http_request message) {
 }
 
 void MicroserviceController::handlePost(http_request message) {
+    TRACE("MicroserviceController::handlePost");
+    TRACE("Request path: ", requestPathString(message));
+    
     auto path = requestPath(message);
-    if (!path.empty() && 
-         path[0] == "users" && 
-         path[1] == "signup") 
+    if (path.size() == 2 && 
+        path[0] == "users" && 
+        path[1] == "signup") 
     {
+        //TRACE("message: ", message.extract_string().get());
+        
         message.
         extract_json().
         then([=](json::value request) 

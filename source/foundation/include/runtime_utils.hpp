@@ -3,7 +3,7 @@
 #include <execinfo.h>
 #include <unistd.h>
 
-namespace cfx 
+namespace kj 
 {
     class RuntimeUtils 
     {

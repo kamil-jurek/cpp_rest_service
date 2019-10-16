@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello jQuery</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="script.js"></script>
+    </head>
+
+    <body>
+        <div>
+            <p class="status">The Status is </p>
+            <p class="time">The time is </p>
+            
+            <form action="http://127.0.1.1:6502/kj/api/users/signup" method="POST" id="my_form">
+                <label>Name</label>
+                <input type="text" name="name" /><br>
+                <label>Last Name</label>
+                <input type="text" name="lastName" /><br>
+                <label>Email</label>
+                <input type="email" name="email" /><br>
+                <label>Password</label>
+                <input type="password" name="password" /><br>
+                <input type="submit" name="submit" value="Submit Form" />
+            <div id="server-results"><!-- For server results --></div>
+            </form>
+        </div>
+    </body>
+</html>

@@ -8,7 +8,7 @@
 using namespace web;
 using namespace http::experimental::listener;
 
-namespace cfx 
+namespace kj 
 {
     class BasicController 
     {
@@ -30,5 +30,6 @@ namespace cfx
         }
 
         std::vector<utility::string_t> requestPath(const http_request & message);
+        utility::string_t requestPathString(const http_request & message);
     };
 }

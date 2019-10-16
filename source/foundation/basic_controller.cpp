@@ -1,7 +1,7 @@
 #include "basic_controller.hpp"
 #include "network_utils.hpp"
 
-namespace cfx 
+namespace kj 
 {
     BasicController::BasicController() 
     {}
@@ -49,5 +49,11 @@ namespace cfx
     {
         auto relativePath = uri::decode(message.relative_uri().path());
         return uri::split_path(relativePath);        
+    }
+
+    utility::string_t BasicController::requestPathString(const http_request & message) 
+    {
+        auto relativePath = uri::decode(message.relative_uri().path());
+        return relativePath;        
     }
 }

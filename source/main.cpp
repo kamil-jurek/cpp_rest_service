@@ -4,9 +4,10 @@
 #include <runtime_utils.hpp>
 
 #include "microsvc_controller.hpp"
+#include "kjUtils.hpp"
 
 using namespace web;
-using namespace cfx;
+using namespace kj;
 
 int main(int argc, const char * argv[]) 
 {
@@ -19,7 +20,7 @@ int main(int argc, const char * argv[])
     {
         // wait for server initialization...
         server.accept().wait();
-        std::cout << "Microservice now listening for requests at: " << server.endpoint() << '\n';
+        TRACE("Microservice now listening for requests at: ",  server.endpoint());
         
         InterruptHandler::waitForUserInterrupt();
 

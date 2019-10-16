@@ -6,7 +6,7 @@
 using namespace boost::asio;
 using namespace boost::asio::ip;
 
-namespace cfx 
+namespace kj 
 { 
    using HostInetInfo = tcp::resolver::iterator;
 
