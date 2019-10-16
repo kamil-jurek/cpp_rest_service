@@ -1,8 +1,7 @@
 #include "network_utils.hpp"
 
-namespace cfx 
+namespace kj 
 {
-
    HostInetInfo NetworkUtils::queryHostInetInfo() 
    {
        io_service ios;
