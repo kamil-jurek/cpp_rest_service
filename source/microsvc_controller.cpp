@@ -2,7 +2,7 @@
 #include "microsvc_controller.hpp"
 
 #include "user_manager.hpp"
-#include "kjUtils.hpp"
+#include "kj_utils.hpp"
 
 #include <tuple>
 #include <chrono>
@@ -177,16 +177,19 @@ void MicroserviceController::handlePost(http_request message) {
                 
                 UserManager users;
                 users.signUp(userInfo);
+                
                 json::value response;
                 response["message"] = json::value::string("succesful registration!");
                 message.reply(status_codes::OK, response);
             }
             catch(UserManagerException & e) 
             {
+                TRACE("UserManagerException: ", e.what());
                 message.reply(status_codes::BadRequest, e.what());
             }
             catch(json::json_exception & e) 
             {
+                TRACE("json::json_exception: ", e.what());
                 message.reply(status_codes::BadRequest);
             }
         });

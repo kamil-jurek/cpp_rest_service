@@ -31,7 +31,7 @@ $(document).ready(function() {
         var post_url = $(this).attr("action"); //get form action url
         var request_method = $(this).attr("method"); //get form GET/POST method
         var form_data = $(this); //Encode form elements for submission
-        var email_val = $(this).attr("email");
+        var email_val = $('input[name=email]').val();
         var JSONObject= {email: email_val, 
             password:"kamil", 
             name:"kamil", 

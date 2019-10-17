@@ -6,19 +6,19 @@
 #include <vector>
 #include <sstream>
 
-#define TRACE(...) kj::MyTraceImplTmp(__LINE__, __FILE__, __VA_ARGS__)
+#define TRACE(...) kj::trace(__LINE__, __FILE__, __VA_ARGS__)
 
 namespace kj
 {   
     static std::string timePointAsString(const std::chrono::system_clock::time_point& tp) 
     {
-        std::time_t t = std::chrono::system_clock::to_time_t(tp);
-        std::string ts = std::ctime(&t);
+        std::time_t time = std::chrono::system_clock::to_time_t(tp);
+        std::string timeStr = std::ctime(&time);
         
         // get rid off new line 
-        ts.resize(ts.size()-1);
+        timeStr.resize(timeStr.size()-1);
         
-        return ts;
+        return timeStr;
     }
 
     static std::vector<std::string> splitString(const std::string& s, char delimiter)
@@ -35,7 +35,7 @@ namespace kj
     }
 
     template <typename ...Args>
-    static void MyTraceImplTmp(int line, const char* filePath, Args&& ...args)
+    static void trace(int line, const char* filePath, Args&& ...args)
     {   
         auto currentTime = std::chrono::system_clock::now();
         auto splittedFilePath = splitString(std::string(filePath), '/');
