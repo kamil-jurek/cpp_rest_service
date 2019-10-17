@@ -22,28 +22,21 @@ void MicroserviceController::initRestOpHandlers()
 
 void MicroserviceController::handleGet(http_request message) 
 {
+    TRACE("MicroserviceController::handleGet");
     auto path = requestPath(message);
     
-    TRACE("MicroserviceController::handleGet");
-    TRACE("Request path: ", requestPathString(message));
+    auto requestPathStr =  requestPathString(message);
+    TRACE("Request path: ", requestPathStr);
 
     if (!path.empty()) 
     {
-        if (path[0] == "test") 
+        if (requestPathStr == "/test") 
         {                    
-            auto currentTime = std::chrono::system_clock::now();
-            std::time_t currentTime_t = std::chrono::system_clock::to_time_t(currentTime);
-
-            auto response = json::value::object();
-            response["version"] = json::value::string("0.1.1");
-            response["status"] = json::value::string("ready!");
-            response["time"] = json::value::string(std::ctime(&currentTime_t));
+            auto response = handleTest();
             message.reply(status_codes::OK, response);
         }
     
-        else if (path.size() == 2 &&
-                 path[0] == "users" && 
-                 path[1] == "signon") 
+        else if (requestPathStr == "/users/signon") 
         {   
             std::cout << "KJ: 0";
             pplx::create_task([=]() -> std::tuple<bool, UserInformation> 
@@ -115,25 +108,7 @@ void MicroserviceController::handleGet(http_request message)
         }
          else if (path.size() == 1 && path[0] == "users")
         {
-            pplx::create_task([=]() 
-            {
-                auto response = json::value::object();
-                std::vector<web::json::value> users;
-                UserManager userManager;
-
-                auto usersVector = userManager.getUsers();
-                for(auto const& userDb : usersVector)
-                {
-                    json::value user;
-                    user["email"] = json::value::string(userDb.email);
-                    user["lastName"] = json::value::string(userDb.lastName); 
-
-                    users.push_back(user);
-                }
-                response["users"] = json::value::array(users);
-
-                message.reply(status_codes::OK, response);  
-            });      
+            handleGetUsers(message);     
         }
    }
 
@@ -152,47 +127,13 @@ void MicroserviceController::handlePut(http_request message) {
 
 void MicroserviceController::handlePost(http_request message) {
     TRACE("MicroserviceController::handlePost");
-    TRACE("Request path: ", requestPathString(message));
     
-    auto path = requestPath(message);
-    if (path.size() == 2 && 
-        path[0] == "users" && 
-        path[1] == "signup") 
-    {
-        //TRACE("message: ", message.extract_string().get());
-        
-        message.
-        extract_json().
-        then([=](json::value request) 
-        {
-            try 
-            {
-                UserInformation userInfo 
-                { 
-                    request.at("email").as_string(),
-                    request.at("password").as_string(),
-                    request.at("name").as_string(),
-                    request.at("lastName").as_string()
-                };
-                
-                UserManager users;
-                users.signUp(userInfo);
-                
-                json::value response;
-                response["message"] = json::value::string("succesful registration!");
-                message.reply(status_codes::OK, response);
-            }
-            catch(UserManagerException & e) 
-            {
-                TRACE("UserManagerException: ", e.what());
-                message.reply(status_codes::BadRequest, e.what());
-            }
-            catch(json::json_exception & e) 
-            {
-                TRACE("json::json_exception: ", e.what());
-                message.reply(status_codes::BadRequest);
-            }
-        });
+    auto requestPathStr =  requestPathString(message);
+    TRACE("Request path: ", requestPathStr);
+    
+    if (requestPathStr == "/users/signup") 
+    {       
+        handleUserSignUp(message);
     }
 }
 
@@ -225,4 +166,73 @@ json::value MicroserviceController::responseNotImpl(const http::method & method)
     response["serviceName"] = json::value::string("C++ Mircroservice Sample");
     response["http_method"] = json::value::string(method);
     return response ;
+}
+
+json::value MicroserviceController::handleTest()
+{
+    auto currentTime = std::chrono::system_clock::now();
+    auto response = json::value::object();
+
+    response["version"] = json::value::string("0.1.1");
+    response["status"] = json::value::string("ready!");
+    response["time"] = json::value::string(kj::timePointAsString(currentTime));
+    
+    return response;
+}
+
+void MicroserviceController::handleUserSignUp(http_request message)
+{
+    message.extract_json().then([=](json::value request) 
+    {
+        try 
+        {
+            UserInformation userInfo 
+            { 
+                request.at("email").as_string(),
+                request.at("password").as_string(),
+                request.at("name").as_string(),
+                request.at("lastName").as_string()
+            };
+            
+            UserManager users;
+            users.signUp(userInfo);
+            
+            json::value response;
+            response["message"] = json::value::string("succesful registration!");
+            message.reply(status_codes::OK, response);
+        }
+        catch(UserManagerException & e) 
+        {
+            TRACE("UserManagerException: ", e.what());
+            message.reply(status_codes::BadRequest, e.what());
+        }
+        catch(json::json_exception & e) 
+        {
+            TRACE("json::json_exception: ", e.what());
+            message.reply(status_codes::BadRequest);
+        }
+    });
+}
+
+void MicroserviceController::handleGetUsers(http_request message)
+{
+    pplx::create_task([=]() 
+    {
+        auto response = json::value::object();
+        std::vector<web::json::value> users;
+        UserManager userManager;
+
+        auto usersVector = userManager.getUsers();
+        for(auto const& userDb : usersVector)
+        {
+            json::value user;
+            user["email"] = json::value::string(userDb.email);
+            user["lastName"] = json::value::string(userDb.lastName); 
+
+            users.push_back(user);
+        }
+        response["users"] = json::value::array(users);
+
+        message.reply(status_codes::OK, response);  
+    }); 
 }

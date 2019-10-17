@@ -24,4 +24,7 @@ public:
 
 private:
     static json::value responseNotImpl(const http::method & method);
+    json::value handleTest();
+    void handleUserSignUp(http_request message);
+    void handleGetUsers(http_request message);
 };
