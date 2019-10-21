@@ -106,7 +106,7 @@ void MicroserviceController::handleGet(http_request message)
                 }
             });
         }
-         else if (path.size() == 1 && path[0] == "users")
+        else if (requestPathStr == "/users")
         {
             handleGetUsers(message);     
         }
@@ -218,7 +218,7 @@ void MicroserviceController::handleGetUsers(http_request message)
 {
     pplx::create_task([=]() 
     {
-        auto response = json::value::object();
+        auto responseJson = json::value::object();
         std::vector<web::json::value> users;
         UserManager userManager;
 
@@ -227,12 +227,17 @@ void MicroserviceController::handleGetUsers(http_request message)
         {
             json::value user;
             user["email"] = json::value::string(userDb.email);
+            user["name"] = json::value::string(userDb.name);
             user["lastName"] = json::value::string(userDb.lastName); 
 
             users.push_back(user);
         }
-        response["users"] = json::value::array(users);
+        responseJson["users"] = json::value::array(users);
 
-        message.reply(status_codes::OK, response);  
+        // message.reply(status_codes::OK, response);  
+        http_response response(status_codes::OK);
+        response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+        response.set_body(responseJson);
+        message.reply(response);
     }); 
 }

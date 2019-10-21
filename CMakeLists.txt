@@ -9,9 +9,6 @@ if(UNIX)
 
     find_package(OpenSSL 1.0.1 REQUIRED)
     set(OPENSSL_VERSION "1.0.1")
-
-elseif(WIN32) # Windows systems including Win64.
-    message(FATAL_ERROR "-- Windows is not supported for now.")
 else()
     message(FATAL_ERROR "-- Unsupported platform sorry! :( ")
 endif()

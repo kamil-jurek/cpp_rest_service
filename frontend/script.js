@@ -29,7 +29,8 @@ $(document).ready(function() {
             data : JSON.stringify(JSONObject),
             async: true,
         }).done(function(response){ //
-            $("#server-results").html(response);
+            $("#server-results").html(response.message);
+            alert(response.message);
         });
     });
     

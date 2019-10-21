@@ -1,0 +1,49 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 3s linear;
+  height: 100px;
+}
+
+.App-header {
+  background-color: rgb(46, 46, 46);
+  height: 180px;
+  padding: 20px;
+  color: rgb(121, 121, 121);
+}
+
+.App-content {
+  background-color: rgb(168, 168, 168);
+  /* height: 180px; */
+  padding: 20px;
+  color: rgb(0, 0, 0);
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.App-list-group{
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.App-list-group tr:nth-child(even){background-color: #b4b2b2;}
+
+.App-list-group tr:hover {background-color: rgb(255, 255, 255);}
+
+.App-list-group th {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  text-align: center;
+  background-color: rgb(40, 43, 40);
+  color: white;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(720deg); }
+}
