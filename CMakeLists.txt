@@ -16,11 +16,11 @@ endif()
 # Configure compiler options ...
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message("-- configuring clang options")
-    set(CMAKE_CXX_FLAGS "-arch x86_64 -std=c++11 -stdlib=libc++ -DBOOST_LOG_DYN_LINK -Wno-deprecated-declarations")
+    set(CMAKE_CXX_FLAGS "-arch x86_64 -std=c++17 -stdlib=libc++ -DBOOST_LOG_DYN_LINK -Wno-deprecated-declarations")
 
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     message("-- configuring gcc options")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -DBOOST_LOG_DYN_LINK")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17 -DBOOST_LOG_DYN_LINK")
 endif()
 
 # Project construction ...

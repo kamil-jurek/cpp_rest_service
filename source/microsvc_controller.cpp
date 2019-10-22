@@ -3,6 +3,8 @@
 
 #include "user_manager.hpp"
 #include "kj_utils.hpp"
+#include <runtime_utils.hpp>
+
 
 #include <tuple>
 #include <chrono>
@@ -18,6 +20,7 @@ void MicroserviceController::initRestOpHandlers()
     listener.support(methods::POST, std::bind(&MicroserviceController::handlePost, this, std::placeholders::_1));
     listener.support(methods::DEL, std::bind(&MicroserviceController::handleDelete, this, std::placeholders::_1));
     listener.support(methods::PATCH, std::bind(&MicroserviceController::handlePatch, this, std::placeholders::_1));
+    listener.support(methods::OPTIONS, std::bind(&MicroserviceController::handleOptions, this, std::placeholders::_1));
 }
 
 void MicroserviceController::handleGet(http_request message) 
@@ -142,11 +145,28 @@ void MicroserviceController::handleDelete(http_request message) {
 }
 
 void MicroserviceController::handleHead(http_request message) {
-    message.reply(status_codes::NotImplemented, responseNotImpl(methods::HEAD));
+    TRACE("MicroserviceController::handleOptions");
+    
+    http_response response(status_codes::OK);
+    response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
+    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+    response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
+    response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type"));
+    message.reply(response);
+
 }
 
-void MicroserviceController::handleOptions(http_request message) {
-    message.reply(status_codes::NotImplemented, responseNotImpl(methods::OPTIONS));
+void MicroserviceController::handleOptions(http_request message) 
+{
+    TRACE("MicroserviceController::handleOptions");
+    
+    http_response response(status_codes::OK);
+    response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
+    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+    response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
+    response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type"));
+    message.reply(response);
+   
 }
 
 void MicroserviceController::handleTrace(http_request message) {
@@ -181,11 +201,14 @@ json::value MicroserviceController::handleTest()
 }
 
 void MicroserviceController::handleUserSignUp(http_request message)
-{
+{   
+    TRACE("handleUserSignUp: ", message.headers().content_type());
+
     message.extract_json().then([=](json::value request) 
     {
         try 
-        {
+        {   
+            TRACE("handleUserSignUp 2");
             UserInformation userInfo 
             { 
                 request.at("email").as_string(),
@@ -194,12 +217,19 @@ void MicroserviceController::handleUserSignUp(http_request message)
                 request.at("lastName").as_string()
             };
             
+            TRACE("handleUserSignUp 3");
             UserManager users;
             users.signUp(userInfo);
             
-            json::value response;
-            response["message"] = json::value::string("succesful registration!");
-            message.reply(status_codes::OK, response);
+            json::value responseJson;
+            responseJson["message"] = json::value::string("succesful registration!");
+            
+            //message.reply(status_codes::OK, response);
+
+            http_response response(status_codes::OK);
+            response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+            response.set_body(responseJson);
+            message.reply(response);
         }
         catch(UserManagerException & e) 
         {
@@ -210,6 +240,11 @@ void MicroserviceController::handleUserSignUp(http_request message)
         {
             TRACE("json::json_exception: ", e.what());
             message.reply(status_codes::BadRequest);
+        }
+        catch(...) 
+        {   
+            TRACE("Exception ...");
+            RuntimeUtils::printStackTrace();
         }
     });
 }

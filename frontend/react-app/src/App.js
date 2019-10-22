@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import MyForm from './MyForm';
 
 class App extends Component {
   render() {
@@ -9,6 +10,7 @@ class App extends Component {
         <Header/>    
         <Content/>       
         <Header/>
+        
       </div>
     );
   }
@@ -50,6 +52,8 @@ class Content extends React.Component {
         
         <UserList  users={this.state.users} />
 
+        <MyForm/>
+
       </div>      
     );
   }
@@ -60,7 +64,7 @@ class UserList extends React.Component {
     return (
       <table className="App-list-group">
         <tbody>
-          <tr><th>Name</th><th>Email</th><th>Last Name</th></tr>
+          <tr><th>Name</th><th>Last Name</th><th>Email</th></tr>
           {this.props.users.map((user, i)=><UserTableRow key={i} name={user.name} email={user.email} lastName={user.lastName} />)}
         </tbody>
       </table>
@@ -72,10 +76,31 @@ const UserTableRow = ({ name, email, lastName }) => {
   return (
         <tr>
            <td>{name}</td>
-           <td>{email}</td>
            <td>{lastName}</td>
+           <td>{email}</td>
         </tr>
   );
 }
+
+// class MyFirstForm extends React.Component {
+//   state = {value: 'blue'}
+
+//   submitForm = () => {
+//     console.log(this.state.value); // zawartość inputa
+//   }
+
+//   handleChange = (event) => {
+//     this.setState({ value: event.target.value });
+//   }
+
+//   render() {
+//     return (
+//       <div className="App-form">
+//         <input value={this.state.value} onChange={this.handleChange} />
+//         <button onClick={this.submitForm}>Submit</button>
+//       </div>
+//     );
+//   }
+// }
 
 export default App;
