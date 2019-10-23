@@ -1,4 +1,5 @@
 import React from 'react';
+import './App.css';
 
 class MyForm extends React.Component {
     constructor() {
@@ -49,21 +50,59 @@ class MyForm extends React.Component {
   
     render() {
       return (
-        <form onSubmit={this.handleSubmit}>
-          <label htmlFor="name">Enter name</label>
-          <input id="name" name="name" type="text" /><br></br>
-  
-          <label htmlFor="email">Enter your email</label>
-          <input id="email" name="email" type="email" /><br></br>
-  
-          <label htmlFor="lastName">Enter your lastName</label>
-          <input id="lastName" name="lastName" type="text" /><br></br>
+        <form onSubmit={this.handleSubmit} className="blackbox-form">
+          <table>
+          <tbody>
+          <tr>
+            <td className="wide-screen-label-cell">
+                <label htmlFor="name">Name</label>
+            </td>
+            <td className="mobile-screen-label-cell">
+                <label htmlFor="name">Name</label>
+                <input id="name" name="name" type="text" />
+                <span className="errors"></span>
+            </td>
+          </tr>
 
-          <label htmlFor="password">Enter your password</label>
-          <input id="password" name="password" type="password" /><br></br>
+          <tr>
+            <td className="wide-screen-label-cell">
+                <label htmlFor="email">Email</label>
+            </td>
+            <td className="mobile-screen-label-cell">
+                <label htmlFor="email">Email</label>
+                <input id="email" name="email" type="email" />
+            </td>
+          </tr>
 
-          <button>Send data!</button>
-          <label htmlFor="result">{this.state.result}</label>
+          <tr>
+            <td className="wide-screen-label-cell">
+                <label htmlFor="email">password</label>
+            </td>
+            <td className="mobile-screen-label-cell">
+                <label htmlFor="password">password</label>
+                <input id="password" name="password" type="password" />
+            </td>
+          </tr>
+
+          <tr>
+            <td className="wide-screen-label-cell">
+                <label htmlFor="lastName">Email</label>
+            </td>
+            <td className="mobile-screen-label-cell">
+                <label htmlFor="lastName">Last Name</label>
+                <input id="lastName" name="lastName" type="text" />
+            </td>
+          </tr>
+
+          <tr>
+          <td className="mobile-screen-label-cell">
+            <button>Send data!</button>
+            <label htmlFor="result">{this.state.result}</label>
+            </td>
+         </tr>
+          
+          </tbody>
+          </table>
         </form>
       );
     }

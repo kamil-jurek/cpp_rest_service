@@ -43,6 +43,37 @@
   color: white;
 }
 
+.blackbox-form tbody {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: rgb(40, 43, 40);
+  color: white;
+}
+
+.wide-screen-label-cell {
+  display: none;
+  text-align: right;
+}
+.mobile-screen-label-cell label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+@media only screen and (min-width: 600px) {
+  .wide-screen-label-cell {
+    display: block;
+  }
+  .mobile-screen-label-cell label {
+    display: none;
+  }
+}
+
+.blackbox-form .errors {
+  color: red;
+  font-size: 12px;
+  font-style: italics;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(720deg); }

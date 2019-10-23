@@ -1,5 +1,6 @@
 #include <mutex>
 #include "user_manager.hpp"
+#include "kj_utils.hpp"
 
 UserDatabase usersDB;
 std::mutex usersDBMutex;
@@ -26,6 +27,19 @@ bool UserManager::signOn(const std::string email, const std::string password, Us
          return true;
       }         
    }
+   return false;
+}
+
+bool UserManager::setUserWeight(const std::string email, double weight)
+{
+   if (usersDB.find(email) != usersDB.end()) 
+   {
+      std::unique_lock<std::mutex> lock { usersDBMutex };
+      usersDB[email].weight = weight;
+
+      return true;
+   }
+
    return false;
 }
 

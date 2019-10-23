@@ -25,9 +25,7 @@ void MicroserviceController::initRestOpHandlers()
 
 void MicroserviceController::handleGet(http_request message) 
 {
-    TRACE("MicroserviceController::handleGet");
-    auto path = requestPath(message);
-    
+    auto path = requestPath(message);  
     auto requestPathStr =  requestPathString(message);
     TRACE("Request path: ", requestPathStr);
 
@@ -41,34 +39,33 @@ void MicroserviceController::handleGet(http_request message)
     
         else if (requestPathStr == "/users/signon") 
         {   
-            std::cout << "KJ: 0";
             pplx::create_task([=]() -> std::tuple<bool, UserInformation> 
             {
-                std::cout << "KJ: 1";
                 auto headers = message.headers();
                 if (message.headers().find("Authorization") == headers.end()) 
                 {    
                     throw std::exception();
                 }
                 
-                std::cout << "KJ: 2";
                 auto authHeader = headers["Authorization"];
-                
+                TRACE("authHeader: ", authHeader);
+
                 auto credsPos = authHeader.find("Basic");
                 if (credsPos == std::string::npos) 
                 {    
                     throw std::exception();
                 }
-                std::cout << "KJ: 3";
+
                 auto base64 = authHeader.substr(credsPos + std::string("Basic").length() + 1);
-                std::cout << "KJ: 4 " << base64 << "\n";
                 if (base64.empty()) 
                 {
                     throw std::exception();
                 }
-                std::cout << "KJ: 5";
+
                 auto bytes = utility::conversions::from_base64(base64);
                 std::string creds(bytes.begin(), bytes.end());
+                TRACE("creds:" , creds);
+
                 auto colonPos = creds.find(":");
                 if (colonPos == std::string::npos) 
                 {
@@ -77,7 +74,8 @@ void MicroserviceController::handleGet(http_request message)
                 
                 auto useremail = creds.substr(0, colonPos);
                 auto password = creds.substr(colonPos + 1, creds.size() - colonPos - 1);            
-                        
+                TRACE("useremail: ", useremail, " password: ", password);    
+
                 UserManager users;
                 UserInformation userInfo;            
                 if (users.signOn(useremail, password, userInfo)) {
@@ -124,8 +122,65 @@ void MicroserviceController::handlePatch(http_request message) {
     message.reply(status_codes::NotImplemented, responseNotImpl(methods::PATCH));
 }
 
-void MicroserviceController::handlePut(http_request message) {
-    message.reply(status_codes::NotImplemented, responseNotImpl(methods::PUT));
+void MicroserviceController::handlePut(http_request message) 
+{    
+    auto path = requestPath(message);
+    auto requestPathStr =  requestPathString(message);
+    TRACE("Request path: ", requestPathStr);
+    
+    if (path.size() >= 2 && path[0] == "users") 
+    {       
+        TRACE("headers.content_type: ", message.headers().content_type());
+        
+        std::string email = path[1];
+        TRACE("email: ", email);
+        //TRACE("request: ", message.extract_string().get());
+        
+        message.extract_json().then([=](json::value request) 
+        {
+            try 
+            {               
+                double weight = request.at("weight").as_double();
+                TRACE("weight: ", weight);
+
+                UserManager users;
+                bool result = users.setUserWeight(email, weight);
+                
+                json::value responseJson;
+                if (result)
+                {
+                    responseJson["message"] = json::value::string("succesful update!");
+                    http_response response(status_codes::OK);
+                    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+                    response.set_body(responseJson);
+                    message.reply(response);
+                }
+                else 
+                {
+                    responseJson["message"] = json::value::string("unsuccesful update!");
+                    http_response response(status_codes::BadRequest);
+                    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+                    response.set_body(responseJson);
+                    message.reply(response);
+                }            
+            }
+            catch(UserManagerException & e) 
+            {
+                TRACE("UserManagerException: ", e.what());
+                message.reply(status_codes::BadRequest, e.what());
+            }
+            catch(json::json_exception & e) 
+            {
+                TRACE("json::json_exception: ", e.what());
+                message.reply(status_codes::BadRequest);
+            }
+            catch(...) 
+            {   
+                TRACE("Exception ...");
+                RuntimeUtils::printStackTrace();
+            }
+        });
+    }
 }
 
 void MicroserviceController::handlePost(http_request message) {
@@ -202,22 +257,21 @@ json::value MicroserviceController::handleTest()
 
 void MicroserviceController::handleUserSignUp(http_request message)
 {   
-    TRACE("handleUserSignUp: ", message.headers().content_type());
+    TRACE("headers.content_type: ", message.headers().content_type());
 
     message.extract_json().then([=](json::value request) 
     {
         try 
         {   
-            TRACE("handleUserSignUp 2");
             UserInformation userInfo 
             { 
                 request.at("email").as_string(),
                 request.at("password").as_string(),
                 request.at("name").as_string(),
-                request.at("lastName").as_string()
+                request.at("lastName").as_string(),
+                0.0
             };
             
-            TRACE("handleUserSignUp 3");
             UserManager users;
             users.signUp(userInfo);
             
@@ -264,6 +318,10 @@ void MicroserviceController::handleGetUsers(http_request message)
             user["email"] = json::value::string(userDb.email);
             user["name"] = json::value::string(userDb.name);
             user["lastName"] = json::value::string(userDb.lastName); 
+            user["weight"] = json::value::number(userDb.weight); 
+
+            TRACE("email:", userDb.email);
+            TRACE("weight:", userDb.weight);
 
             users.push_back(user);
         }

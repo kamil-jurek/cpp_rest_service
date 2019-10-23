@@ -9,7 +9,7 @@
 using namespace web;
 using namespace kj;
 
-int main(int argc, const char * argv[]) 
+int main() 
 {
     InterruptHandler::hookSIGINT();
 

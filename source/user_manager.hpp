@@ -8,7 +8,8 @@ typedef struct
    std::string email;
    std::string password;
    std::string name;
-   std::string lastName;   
+   std::string lastName;
+   double weight;   
 
 } UserInformation;
 
@@ -32,7 +33,9 @@ class UserManager
   public:
    void signUp(const UserInformation & userInfo);
    
-   bool signOn(const std::string email,const std::string password, UserInformation& userInfo);
+   bool signOn(const std::string email, const std::string password, UserInformation& userInfo);
+
+   bool setUserWeight(const std::string email, double weight);
 
    std::vector<UserInformation> getUsers();
 };
