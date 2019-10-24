@@ -67,6 +67,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "*.dat": "cpp"
+        "*.dat": "cpp",
+        "shared_mutex": "cpp",
+        "bit": "cpp"
     }
 }

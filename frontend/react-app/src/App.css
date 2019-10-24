@@ -9,14 +9,20 @@
 
 .App-header {
   background-color: rgb(46, 46, 46);
-  height: 180px;
+  height: 150px;
   padding: 20px;
   color: rgb(121, 121, 121);
+  position: fixed;
+  z-index: 1; /* Stay on top */
+  top: 0;
+  margin-left: 200px;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .App-content {
   background-color: rgb(168, 168, 168);
-   height: 500px; 
+  margin-top: 190px; 
   padding: 20px;
   color: rgb(0, 0, 0);
 }
@@ -29,15 +35,41 @@
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
   width: 100%;
+  background-color: rgb(248, 244, 244);
 }
 
-.App-list-group tr:nth-child(even){background-color: #b4b2b2;}
+/* .App-list-group tr:nth-child(even) {
+  background-color: #b4b2b2;
+} */
 
-.App-list-group tr:hover {background-color: rgb(255, 255, 255);}
+.App-sidebar {
+  width: 200px;
+  background-color: rgb(102, 99, 99);
+  height: 100%;
+  position: fixed;
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  overflow-x: hidden;
+}
 
+.App-sidebar a {
+  padding: 16px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  color: rgb(0, 0, 0);
+  display: block;
+}
+
+.App-content-bar {
+  margin-left: 200px;
+}
+/* .App-list-group tr:hover {
+  background-color: rgb(85, 182, 238);
+} */
 .App-list-group th {
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   text-align: center;
   background-color: rgb(40, 43, 40);
   color: white;
@@ -53,10 +85,35 @@
 .wide-screen-label-cell {
   display: none;
   text-align: right;
+  padding: 10px;
 }
 .mobile-screen-label-cell label {
   font-size: 13px;
   font-weight: bold;
+  padding: 10px;
+}
+
+/* .tr-selected {
+  background-color: rgb(85, 182, 238);
+} */
+
+.tr.segmentsList{
+  color: white;
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+.segmentsList td{
+  /* color: black; */
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+.segmentsList:hover, .segmentsList.selected {
+  background: rgb(39, 86, 114);
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+ 
 }
 
 @media only screen and (min-width: 600px) {

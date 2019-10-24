@@ -27,6 +27,20 @@ class Header extends React.Component {
   }
 }
 
+class SideBar extends React.Component {
+  render() {
+     return (
+      <div className="App-sidebar">
+          <a href="#">About</a>
+          <a href="#">Services</a>
+          <a href="#">Clients</a>
+          <a href="#">Contact</a>
+      </div>
+     );
+  }
+}
+
+
 class Content extends React.Component {
   constructor() {
     super();
@@ -54,26 +68,50 @@ class Content extends React.Component {
   render() {
     return (
       <div className="App-content">
-        <p className="App-intro">
-            To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-        {/* {this.refresh()} */}
-        <UserList  users={this.state.users} />
+        <SideBar/>
+        <div className="App-content-bar">
+          <p className="App-intro" >
+              To get started, edit <code>src/App.js</code> and save to reload.
+          </p>
+          {/* {this.refresh()} */}
+          <UserList  users={this.state.users} />
 
-        <MyForm/>
-
+          <MyForm/>
+        </div>
       </div>      
     );
   }
 }
 
 class UserList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { activeWord: -1 }
+  }
+  
+  onClickFunction = (idx) => {
+    this.setState({activeWord: idx})
+  }
+
   render() {
     return (
       <table className="App-list-group">
         <tbody>
           <tr><th>Name</th><th>Last Name</th><th>Email</th><th>Weight</th></tr>
-          {this.props.users.map((user, i)=><UserTableRow key={i} name={user.name} email={user.email} lastName={user.lastName} weight={user.weight} />)}
+          {this.props.users.map((user, i)=>
+            // <UserTableRow key={i} name={user.name} email={user.email} lastName={user.lastName} weight={user.weight} />
+            <tr 
+             onClick={this.onClickFunction.bind(null, i)}
+             className={`segmentsList${this.state.activeWord === i ? ' selected' : ''}`}
+             key={i} >
+              <td>{user.name}</td>
+              <td>{user.lastName}</td>
+              <td>{user.email}</td>
+              <td>{user.weight}</td>
+            </tr>
+          
+          )}
+       
         </tbody>
       </table>
     );
@@ -82,7 +120,7 @@ class UserList extends React.Component {
 
 const UserTableRow = ({ name, email, lastName, weight }) => {
   return (
-        <tr>
+        <tr className="tr-selected" >
            <td>{name}</td>
            <td>{lastName}</td>
            <td>{email}</td>
@@ -90,26 +128,5 @@ const UserTableRow = ({ name, email, lastName, weight }) => {
         </tr>
   );
 }
-
-// class MyFirstForm extends React.Component {
-//   state = {value: 'blue'}
-
-//   submitForm = () => {
-//     console.log(this.state.value); // zawartość inputa
-//   }
-
-//   handleChange = (event) => {
-//     this.setState({ value: event.target.value });
-//   }
-
-//   render() {
-//     return (
-//       <div className="App-form">
-//         <input value={this.state.value} onChange={this.handleChange} />
-//         <button onClick={this.submitForm}>Submit</button>
-//       </div>
-//     );
-//   }
-// }
 
 export default App;

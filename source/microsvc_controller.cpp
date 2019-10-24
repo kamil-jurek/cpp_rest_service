@@ -202,24 +202,15 @@ void MicroserviceController::handleDelete(http_request message) {
 void MicroserviceController::handleHead(http_request message) {
     TRACE("MicroserviceController::handleOptions");
     
-    http_response response(status_codes::OK);
-    response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
-    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
-    response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
-    response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type"));
+    http_response response = prepareResponse(status_codes::OK);
     message.reply(response);
-
 }
 
 void MicroserviceController::handleOptions(http_request message) 
 {
     TRACE("MicroserviceController::handleOptions");
     
-    http_response response(status_codes::OK);
-    response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
-    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
-    response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
-    response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type"));
+    http_response response = prepareResponse(status_codes::OK);
     message.reply(response);
    
 }
@@ -257,6 +248,7 @@ json::value MicroserviceController::handleTest()
 
 void MicroserviceController::handleUserSignUp(http_request message)
 {   
+    TRACE("MicroserviceController::handleUserSignUp()");
     TRACE("headers.content_type: ", message.headers().content_type());
 
     message.extract_json().then([=](json::value request) 
@@ -305,6 +297,9 @@ void MicroserviceController::handleUserSignUp(http_request message)
 
 void MicroserviceController::handleGetUsers(http_request message)
 {
+    TRACE("MicroserviceController::handleGetUsers()");
+    TRACE("headers.content_type: ", message.headers().content_type());
+
     pplx::create_task([=]() 
     {
         auto responseJson = json::value::object();
@@ -320,9 +315,6 @@ void MicroserviceController::handleGetUsers(http_request message)
             user["lastName"] = json::value::string(userDb.lastName); 
             user["weight"] = json::value::number(userDb.weight); 
 
-            TRACE("email:", userDb.email);
-            TRACE("weight:", userDb.weight);
-
             users.push_back(user);
         }
         responseJson["users"] = json::value::array(users);
@@ -331,6 +323,18 @@ void MicroserviceController::handleGetUsers(http_request message)
         http_response response(status_codes::OK);
         response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
         response.set_body(responseJson);
+
         message.reply(response);
     }); 
+}
+
+web::http::http_response MicroserviceController::prepareResponse(http::status_code code)
+{
+    http_response response(code);
+    response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
+    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+    response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
+    response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type"));  
+
+    return response; 
 }

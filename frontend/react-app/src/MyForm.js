@@ -50,9 +50,10 @@ class MyForm extends React.Component {
   
     render() {
       return (
-        <form onSubmit={this.handleSubmit} className="blackbox-form">
+        <form onSubmit={this.handleSubmit} className="blackbox-form">         
           <table>
           <tbody>
+          <tr>Add user:</tr>
           <tr>
             <td className="wide-screen-label-cell">
                 <label htmlFor="name">Name</label>
