@@ -1,132 +1,49 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import MyForm from './MyForm';
+import React, { useState } from "react";
+import { Link, withRouter } from "react-router-dom";
+import { Nav, Navbar, NavItem } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+import Routes from "./Routes";
+import "./App.css";
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <Header/>    
-        <Content/>       
-        <Header/>
-        
-      </div>
-    );
-  }
-}
+function App(props) {
+  const [isAuthenticated, userHasAuthenticated] = useState(false);
 
-class Header extends React.Component {
-  render() {
-     return (
-      <div className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h2>Welcome to React</h2>
-      </div>
-     );
-  }
-}
-
-class SideBar extends React.Component {
-  render() {
-     return (
-      <div className="App-sidebar">
-          <a href="#">About</a>
-          <a href="#">Services</a>
-          <a href="#">Clients</a>
-          <a href="#">Contact</a>
-      </div>
-     );
-  }
-}
-
-
-class Content extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      users: []
-    };
-  }
-  
-  componentDidMount() {  
-    fetch("http://127.0.1.1:6502/kj/api/users")
-      .then(res => res.json())
-      .then(json => {
-        console.log(json.users);
-        this.setState({ users: json.users })});   
-  }
-  
-  // componentDidUpdate() {
-  //   fetch("http://127.0.1.1:6502/kj/api/users")
-  //     .then(res => res.json())
-  //     .then(json => {
-  //       console.log(json.users);
-  //       this.setState({ users: json.users })});
-  // }
-
-  render() {
-    return (
-      <div className="App-content">
-        <SideBar/>
-        <div className="App-content-bar">
-          <p className="App-intro" >
-              To get started, edit <code>src/App.js</code> and save to reload.
-          </p>
-          {/* {this.refresh()} */}
-          <UserList  users={this.state.users} />
-
-          <MyForm/>
-        </div>
-      </div>      
-    );
-  }
-}
-
-class UserList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { activeWord: -1 }
-  }
-  
-  onClickFunction = (idx) => {
-    this.setState({activeWord: idx})
+  function handleLogout() {
+    userHasAuthenticated(false);
+    props.history.push("/login");
   }
 
-  render() {
-    return (
-      <table className="App-list-group">
-        <tbody>
-          <tr><th>Name</th><th>Last Name</th><th>Email</th><th>Weight</th></tr>
-          {this.props.users.map((user, i)=>
-            // <UserTableRow key={i} name={user.name} email={user.email} lastName={user.lastName} weight={user.weight} />
-            <tr 
-             onClick={this.onClickFunction.bind(null, i)}
-             className={`segmentsList${this.state.activeWord === i ? ' selected' : ''}`}
-             key={i} >
-              <td>{user.name}</td>
-              <td>{user.lastName}</td>
-              <td>{user.email}</td>
-              <td>{user.weight}</td>
-            </tr>
-          
-          )}
-       
-        </tbody>
-      </table>
-    );
-  }
-}
-
-const UserTableRow = ({ name, email, lastName, weight }) => {
   return (
-        <tr className="tr-selected" >
-           <td>{name}</td>
-           <td>{lastName}</td>
-           <td>{email}</td>
-           <td>{weight}</td>
-        </tr>
+    <div className="App container">
+      <Navbar fluid collapseOnSelect>
+        <Navbar.Header>
+          <Navbar.Brand>
+            <Link to="/">KJ React App</Link>
+          </Navbar.Brand>
+          <Navbar.Toggle />
+        </Navbar.Header>
+        <Navbar.Collapse>
+          <Nav pullRight>
+            <LinkContainer to="/users">
+              <NavItem>Users</NavItem>
+            </LinkContainer>
+            {isAuthenticated
+              ? <NavItem onClick={handleLogout}>Logout</NavItem>
+              : <React.Fragment>
+                  <LinkContainer to="/signup">
+                    <NavItem>Signup</NavItem>
+                  </LinkContainer>
+                  <LinkContainer to="/login">
+                    <NavItem>Login</NavItem>
+                  </LinkContainer>
+                </React.Fragment>
+            }
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+      <Routes appProps={{ isAuthenticated, userHasAuthenticated }} />
+    </div>
   );
 }
 
-export default App;
+export default withRouter(App);

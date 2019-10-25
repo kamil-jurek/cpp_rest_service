@@ -41,6 +41,7 @@ void MicroserviceController::handleGet(http_request message)
         {   
             pplx::create_task([=]() -> std::tuple<bool, UserInformation> 
             {
+                TRACE("pplx::create_task([=]() -> std::tuple<bool, UserInformation>");
                 auto headers = message.headers();
                 if (message.headers().find("Authorization") == headers.end()) 
                 {    
@@ -94,16 +95,24 @@ void MicroserviceController::handleGet(http_request message)
                     {
                         json::value response;
                         response["success"] = json::value::string("welcome " + std::get<1>(result).name + "!");                    
-                        message.reply(status_codes::OK, response);
+                        // message.reply(status_codes::OK, response);
+
+                        http_response httpResponse = prepareResponse(status_codes::OK);
+                        message.reply(httpResponse);
+   
                     }
                     else 
                     {
-                        message.reply(status_codes::Unauthorized);
+                        //message.reply(status_codes::Unauthorized);
+                        http_response httpResponse = prepareResponse(status_codes::Unauthorized);
+                        message.reply(httpResponse);
                     }
                 }
                 catch(std::exception) 
                 {
-                    message.reply(status_codes::Unauthorized);
+                    //message.reply(status_codes::Unauthorized);
+                    http_response httpResponse = prepareResponse(status_codes::Unauthorized);
+                    message.reply(httpResponse);
                 }
             });
         }
@@ -114,6 +123,7 @@ void MicroserviceController::handleGet(http_request message)
    }
 
     else {
+        TRACE("NotFound");
         message.reply(status_codes::NotFound);
     }
 }
@@ -334,7 +344,7 @@ web::http::http_response MicroserviceController::prepareResponse(http::status_co
     response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
     response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
     response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
-    response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type"));  
+    response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type, Authorization"));  
 
     return response; 
 }
