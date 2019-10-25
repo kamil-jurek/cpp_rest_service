@@ -45,13 +45,13 @@ namespace kj
         return listener.close();
     }
 
-    std::vector<utility::string_t> BasicController::requestPathVector(const http_request & message) 
+    std::vector<utility::string_t> BasicController::requestPath(const http_request & message) 
     {
         auto relativePath = uri::decode(message.relative_uri().path());
         return uri::split_path(relativePath);        
     }
 
-    utility::string_t BasicController::requestPath(const http_request & message) 
+    utility::string_t BasicController::requestPathString(const http_request & message) 
     {
         auto relativePath = uri::decode(message.relative_uri().path());
         return relativePath;        

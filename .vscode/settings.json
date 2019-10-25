@@ -25,6 +25,7 @@
         "condition_variable": "cpp",
         "cstdint": "cpp",
         "deque": "cpp",
+        "forward_list": "cpp",
         "list": "cpp",
         "unordered_map": "cpp",
         "unordered_set": "cpp",
@@ -66,6 +67,9 @@
         "cfenv": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "*.dat": "cpp",
+        "shared_mutex": "cpp",
+        "bit": "cpp"
     }
 }

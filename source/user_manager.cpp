@@ -1,12 +1,13 @@
 #include <mutex>
 #include "user_manager.hpp"
+#include "kj_utils.hpp"
 
 UserDatabase usersDB;
 std::mutex usersDBMutex;
 
 void UserManager::signUp(const UserInformation& userInfo)
 {
-   
+   TRACE("UserManager::signUp() email:", userInfo.email); 
    std::unique_lock<std::mutex> lock { usersDBMutex };
    if (usersDB.find(userInfo.email) != usersDB.end()) 
    {
@@ -16,7 +17,8 @@ void UserManager::signUp(const UserInformation& userInfo)
 }
 
 bool UserManager::signOn(const std::string email, const std::string password, UserInformation& userInfo) 
-{   
+{
+   TRACE("UserManager::signOn() email:", email, " password: ", password);   
    if (usersDB.find(email) != usersDB.end()) 
    {
       auto ui = usersDB[email];
@@ -29,8 +31,23 @@ bool UserManager::signOn(const std::string email, const std::string password, Us
    return false;
 }
 
+bool UserManager::setUserWeight(const std::string email, double weight)
+{
+   TRACE("UserManager::setUserWeight() email:", email, " weight: ", weight);
+   if (usersDB.find(email) != usersDB.end()) 
+   {
+      std::unique_lock<std::mutex> lock { usersDBMutex };
+      usersDB[email].weight = weight;
+
+      return true;
+   }
+
+   return false;
+}
+
 std::vector<UserInformation> UserManager::getUsers()
 {
+   TRACE("UserManager::getUsers()");
    std::vector<UserInformation> users;
       for(auto const& kv : usersDB)
       {

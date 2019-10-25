@@ -29,7 +29,7 @@ namespace kj
             /* had to be implemented by the child class */ 
         }
 
-        std::vector<utility::string_t> requestPathVector(const http_request & message);
-        utility::string_t requestPath(const http_request & message);
+        std::vector<utility::string_t> requestPath(const http_request & message);
+        utility::string_t requestPathString(const http_request & message);
     };
 }
