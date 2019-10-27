@@ -5,6 +5,7 @@
 
 typedef struct 
 {
+   unsigned int userId = 0;
    std::string email;
    std::string password;
    std::string name;
@@ -31,11 +32,16 @@ using UserDatabase = std::map<std::string, UserInformation>;
 class UserManager 
 {
   public:
-   void signUp(const UserInformation & userInfo);
+   void signUp(UserInformation & userInfo);
    
    bool signOn(const std::string email, const std::string password, UserInformation& userInfo);
 
    bool setUserWeight(const std::string email, double weight);
 
+   UserInformation getUser(unsigned int userId);
+
    std::vector<UserInformation> getUsers();
+
+  private:
+   unsigned int getNextId();
 };

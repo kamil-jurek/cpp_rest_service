@@ -36,7 +36,12 @@ void MicroserviceController::handleGet(http_request message)
             auto response = handleTest();
             message.reply(status_codes::OK, response);
         }
-    
+
+        else if (path.size() == 2 && path[0] == "users" && std::stoi(path[1]) != 0)
+        {
+            handleGetUser(message, std::stoi(path[1]));
+        }
+
         else if (requestPathStr == "/users/signon") 
         {   
             pplx::create_task([=]() -> std::tuple<bool, UserInformation> 
@@ -272,6 +277,7 @@ void MicroserviceController::handleUserSignUp(http_request message)
         {   
             UserInformation userInfo 
             { 
+                0,
                 request.at("email").as_string(),
                 request.at("password").as_string(),
                 request.at("name").as_string(),
@@ -329,10 +335,37 @@ void MicroserviceController::handleGetUsers(http_request message)
             user["name"] = json::value::string(userDb.name);
             user["lastName"] = json::value::string(userDb.lastName); 
             user["weight"] = json::value::number(userDb.weight); 
+            user["userId"] = json::value::number(userDb.userId); 
 
             users.push_back(user);
         }
         responseJson["users"] = json::value::array(users);
+
+        // message.reply(status_codes::OK, response);  
+        http_response response(status_codes::OK);
+        response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+        response.set_body(responseJson);
+
+        message.reply(response);
+    }); 
+}
+
+void MicroserviceController::handleGetUser(http_request message, int userId)
+{
+    TRACE("MicroserviceController::handleGetUser(", userId, ")");
+    TRACE("headers.content_type: ", message.headers().content_type());
+
+    pplx::create_task([=]() 
+    {
+        auto responseJson = json::value::object();
+        UserManager userManager;
+
+        auto userDb = userManager.getUser(userId);         
+        responseJson["email"] = json::value::string(userDb.email);
+        responseJson["name"] = json::value::string(userDb.name);
+        responseJson["lastName"] = json::value::string(userDb.lastName); 
+        responseJson["weight"] = json::value::number(userDb.weight); 
+        responseJson["userId"] = json::value::number(userDb.userId); 
 
         // message.reply(status_codes::OK, response);  
         http_response response(status_codes::OK);

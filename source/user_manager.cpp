@@ -4,8 +4,9 @@
 
 UserDatabase usersDB;
 std::mutex usersDBMutex;
+std::atomic<unsigned int> userId{1000};
 
-void UserManager::signUp(const UserInformation& userInfo)
+void UserManager::signUp(UserInformation& userInfo)
 {
    TRACE("UserManager::signUp() email:", userInfo.email); 
    std::unique_lock<std::mutex> lock { usersDBMutex };
@@ -13,6 +14,8 @@ void UserManager::signUp(const UserInformation& userInfo)
    {
       throw UserManagerException("user already exists!");
    }
+
+   userInfo.userId = getNextId();
    usersDB.insert(std::pair<std::string, UserInformation>(userInfo.email, userInfo));   
 }
 
@@ -49,10 +52,33 @@ std::vector<UserInformation> UserManager::getUsers()
 {
    TRACE("UserManager::getUsers()");
    std::vector<UserInformation> users;
-      for(auto const& kv : usersDB)
-      {
-         users.push_back(kv.second);
-      }
+   for(auto const& kv : usersDB)
+   {
+      users.push_back(kv.second);
+   }
 
    return users;
+}
+
+UserInformation UserManager::getUser(unsigned int userId)
+{
+   TRACE("UserManager::getUser(userId:", userId, ")");
+   UserInformation user;
+   for(auto const& kv : usersDB)
+   {
+      if (kv.second.userId == userId)
+      {  
+         user = kv.second;
+      }    
+   }
+
+   return user;
+}
+
+unsigned int UserManager::getNextId()
+{  
+   unsigned int nextUserId = ++userId;
+   TRACE("UserManager::getNextId(), userId: ", nextUserId);
+   
+   return nextUserId;
 }

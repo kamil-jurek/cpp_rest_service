@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { useFormFields } from "../libs/hooksLib";
 import "./Signup.css";
 
 export default function Login(props) {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [password, setPassword] = useState("");
+  const [fields, handleFieldChange] = useFormFields({
+    email: "",
+    password: "",
+    name: "",
+    lastName: ""
+  });
 
   function validateForm() {
-    return email.length > 0 && password.length > 0;
+    return fields.email.length > 0 && 
+           fields.password.length > 0 && 
+           fields.name.length > 0 && 
+           fields.lastName.length > 0;
   }
 
   function handleSubmit(event) {
@@ -21,10 +27,10 @@ export default function Login(props) {
         },
         method: 'POST',     
         body: JSON.stringify({
-            "email": email, 
-            "password": password, 
-            "name": name, 
-            "lastName": lastName,
+            "email": fields.email, 
+            "password": fields.password, 
+            "name": fields.name, 
+            "lastName": fields.lastName,
         }),
     }).then(res => {
         console.log(res);
@@ -41,31 +47,31 @@ export default function Login(props) {
           <FormControl
             autoFocus
             type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            value={fields.email}
+            onChange={handleFieldChange}
           />
         </FormGroup>
         <FormGroup controlId="password" bsSize="large">
           <ControlLabel>Password</ControlLabel>
           <FormControl
-            value={password}
-            onChange={e => setPassword(e.target.value)}
+            value={fields.password}
+            onChange={handleFieldChange}
             type="password"
           />
         </FormGroup>
         <FormGroup controlId="name" bsSize="large">
           <ControlLabel>Name</ControlLabel>
           <FormControl
-            value={name}
-            onChange={e => setName(e.target.value)}
+            value={fields.name}
+            onChange={handleFieldChange}
             type="text"
           />
         </FormGroup>
         <FormGroup controlId="lastName" bsSize="large">
           <ControlLabel>Last Name</ControlLabel>
           <FormControl
-            value={lastName}
-            onChange={e => setLastName(e.target.value)}
+            value={fields.lastName}
+            onChange={handleFieldChange}
             type="text"
           />
         </FormGroup>

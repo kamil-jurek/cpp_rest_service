@@ -26,6 +26,7 @@ private:
     static json::value responseNotImpl(const http::method& method);
     json::value handleTest();
     void handleUserSignUp(http_request message);
+    void handleGetUser(http_request message, int userId);
     void handleGetUsers(http_request message);
 
     web::http::http_response prepareResponse(http::status_code code);

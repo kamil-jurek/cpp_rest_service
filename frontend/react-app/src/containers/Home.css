@@ -11,3 +11,16 @@
   .Home .lander p {
     color: #999;
   }
+
+  .Home .users h4 {
+    font-family: "Open Sans", sans-serif;
+    font-weight: 60;
+    overflow: hidden;
+    line-height: 1.5;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background: #666
+  }
+  .Home .users p {
+    color: rgb(185, 29, 29);
+  }

@@ -10,14 +10,21 @@ padding: 8px;
 border-bottom: 1px solid #ccc;
 } */
 
-.segmentsList td, .th {
+.userRow td {
     padding: 8px;
     border-bottom: 1px solid #ccc;
 }
 
-.segmentsList:hover, .segmentsList.selected {
-    background: rgb(40, 80, 110);
+.userRow:hover, .userRow.selected {
+    background: rgb(20, 98, 158);
     color: rgb(255, 255, 255);
     cursor: pointer;
 
+}
+
+tr th {
+    padding: 8px;
+    background-color: rgb(175, 172, 172);
+    border-bottom: 2px solid #ccc;
+    border-top: 2px solid #ccc;
 }

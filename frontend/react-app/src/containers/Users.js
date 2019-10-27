@@ -1,44 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import "./Users.css";
 
 export default function Users(props) {
-  return (
-    <div className="Users">
-      <UserList/>
-    </div>
-  );
-}
+  const [users, setUsers] = useState([]);
+  const [activeUser, setActiveUser] = useState(-1);
 
-class UserList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { 
-        activeWord: -1,
-        users: [] }
-  }
+  useEffect(() => {
+    async function onLoad() {
+      await loadUsers();
+    }
   
-    componentDidMount() {  
+    onLoad();
+  }, []);
+  
+  function loadUsers() {
     fetch("http://127.0.1.1:6502/kj/api/users")
         .then(res => res.json())
         .then(json => {
-        console.log(json.users);
-        this.setState({ users: json.users })});   
+          console.log(json.users);
+          setUsers(json.users)
+        });   
     }
 
-  onClickFunction = (idx) => {
-    this.setState({activeWord: idx})
+  function onClickFunction(idx) {
+    setActiveUser(idx);
   }
 
-  render() {
-    return (
-      <table className="UsersTable">
+  return (
+    <table className="UsersTable">
+         <thead>
+          <tr>
+            <th>UserId</th>
+            <th>Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Weight</th>
+          </tr>
+         </thead>
         <tbody>
-          <tr><th>Name</th><th>Last Name</th><th>Email</th><th>Weight</th></tr>
-          {this.state.users.map((user, i)=>
+          {users.map((user, i)=>
             <tr 
-             onClick={this.onClickFunction.bind(null, i)}
-             className={`segmentsList${this.state.activeWord === i ? ' selected' : ''}`}
+             onClick={onClickFunction.bind(null, i)}
+             className={`userRow${activeUser === i ? ' selected' : ''}`}
              key={i} >
+              {activeUser === i ? 
+                <td>active</td> :
+                <td>{user.userId}</td>  
+              }
+              
               <td>{user.name}</td>
               <td>{user.lastName}</td>
               <td>{user.email}</td>
@@ -49,5 +58,4 @@ class UserList extends React.Component {
         </tbody>
       </table>
     );
-  }
 }
