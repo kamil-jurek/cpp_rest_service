@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { LoaderButton, FormGroup, FormControl} from "react-bootstrap";
+import { FormGroup, FormControl} from "react-bootstrap";
+import LoaderButton from "../components/LoaderButton";
 
 export default function User(props) {
     const [user, setUser] = useState(null);
@@ -36,8 +37,23 @@ export default function User(props) {
 
   function handleSubmit(event) {
     event.preventDefault();
-
     setIsLoading(true);
+    fetch("http://127.0.1.1:6502/kj/api/users/"+props.match.params.id, {
+        headers: {
+            'Content-Type':'application/json',
+        },
+        method: 'PUT', 
+        body: JSON.stringify({ 
+            "name": name, 
+            "lastName": lastName,
+            "weight": parseFloat(weight)
+        }),    
+    }).then(res => {
+        setIsLoading(false);
+        console.log(res);             
+    }).catch(err => err);
+
+    
   }
 
   async function handleDelete(event) {
@@ -117,45 +133,42 @@ export default function User(props) {
                     <td>{email}</td>
                     <td>{weight}</td>
                 </tr>                
-            </tbody>
-          </table>
-
-
-        <form onSubmit={handleSubmit}>
             
-            {/* <LoaderButton
+
+                <tr className='' >
+                  <td>
+        <form onSubmit={handleSubmit}>    
+            <LoaderButton
                 block
                 type="submit"
                 bsSize="large"
                 bsStyle="primary"
                 isLoading={isLoading}
                 disabled={!validateForm()}
+        
             >
-                Save
-            </LoaderButton> */} 
+                 Save
+             </LoaderButton>
+             </form>
+            </td>
+            <td>
+            <form onSubmit={handleSubmit}>    
+         <LoaderButton
+                block
+               bsSize="large"
+               bsStyle="danger"
+                 onClick={handleDelete}
+             isLoading={isDeleting}
+                 >
+                Delete
+            </LoaderButton> 
             </form>
-            </div>
-        //     {/* <LoaderButton
-        //         block
-        //         type="submit"
-        //         bsSize="large"
-        //         bsStyle="primary"
-        //         isLoading={isLoading}
-        //         disabled={!validateForm()}
-        //     >
-        //         Save
-        //     </LoaderButton> */}
-        //     {/* <LoaderButton
-        //         block
-        //         bsSize="large"
-        //         bsStyle="danger"
-        //         onClick={handleDelete}
-        //         isLoading={isDeleting}
-        //         >
-        //         Delete
-        //     </LoaderButton> */}
-        // </form>
-
+        </td>
+        </tr>
+        
+        </tbody>
+          </table>
+    </div>
         )}
     </div>
   );

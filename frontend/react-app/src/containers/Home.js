@@ -32,7 +32,7 @@ export default function Home(props) {
   function renderUsersList(users) {
     return [{}].concat(users).map((user, i) =>
     i !== 0 ? (
-      <LinkContainer key={i} to={`/home`}>
+      <LinkContainer key={i} to={`users/${user.userId}`}>
         <ListGroupItem>
           <p>
             {"weight: " + user.weight}

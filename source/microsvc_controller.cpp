@@ -33,99 +33,24 @@ void MicroserviceController::handleGet(http_request message)
     {
         if (requestPathStr == "/test") 
         {                    
-            auto response = handleTest();
-            message.reply(status_codes::OK, response);
+            handleTest(message);          
+        }
+
+        else if (requestPathStr == "/users/signon") 
+        {   
+            handleSignOn(message);
+        }
+        
+        else if (requestPathStr == "/users")
+        {
+            handleGetUsers(message);     
         }
 
         else if (path.size() == 2 && path[0] == "users" && std::stoi(path[1]) != 0)
         {
             handleGetUser(message, std::stoi(path[1]));
         }
-
-        else if (requestPathStr == "/users/signon") 
-        {   
-            pplx::create_task([=]() -> std::tuple<bool, UserInformation> 
-            {
-                TRACE("pplx::create_task([=]() -> std::tuple<bool, UserInformation>");
-                auto headers = message.headers();
-                if (message.headers().find("Authorization") == headers.end()) 
-                {    
-                    throw std::exception();
-                }
-                
-                auto authHeader = headers["Authorization"];
-                TRACE("authHeader: ", authHeader);
-
-                auto credsPos = authHeader.find("Basic");
-                if (credsPos == std::string::npos) 
-                {    
-                    throw std::exception();
-                }
-
-                auto base64 = authHeader.substr(credsPos + std::string("Basic").length() + 1);
-                if (base64.empty()) 
-                {
-                    throw std::exception();
-                }
-
-                auto bytes = utility::conversions::from_base64(base64);
-                std::string creds(bytes.begin(), bytes.end());
-                TRACE("creds:" , creds);
-
-                auto colonPos = creds.find(":");
-                if (colonPos == std::string::npos) 
-                {
-                    throw std::exception();
-                }
-                
-                auto useremail = creds.substr(0, colonPos);
-                auto password = creds.substr(colonPos + 1, creds.size() - colonPos - 1);            
-                TRACE("useremail: ", useremail, " password: ", password);    
-
-                UserManager users;
-                UserInformation userInfo;            
-                if (users.signOn(useremail, password, userInfo)) {
-                    return std::make_tuple(true, userInfo);
-                }
-                else {
-                    return std::make_tuple(false, UserInformation {});
-                }
-            })
-            .then([=](pplx::task<std::tuple<bool, UserInformation>> resultTsk) 
-            {
-                try 
-                {
-                    auto result = resultTsk.get();
-                    if (std::get<0>(result) == true) 
-                    {
-                        json::value response;
-                        response["success"] = json::value::string("welcome " + std::get<1>(result).name + "!");                    
-                        // message.reply(status_codes::OK, response);
-
-                        http_response httpResponse = prepareResponse(status_codes::OK);
-                        message.reply(httpResponse);
-   
-                    }
-                    else 
-                    {
-                        //message.reply(status_codes::Unauthorized);
-                        http_response httpResponse = prepareResponse(status_codes::Unauthorized);
-                        message.reply(httpResponse);
-                    }
-                }
-                catch(std::exception) 
-                {
-                    //message.reply(status_codes::Unauthorized);
-                    http_response httpResponse = prepareResponse(status_codes::Unauthorized);
-                    message.reply(httpResponse);
-                }
-            });
-        }
-        else if (requestPathStr == "/users")
-        {
-            handleGetUsers(message);     
-        }
-   }
+    }
 
     else {
         TRACE("NotFound");
@@ -133,7 +58,8 @@ void MicroserviceController::handleGet(http_request message)
     }
 }
 
-void MicroserviceController::handlePatch(http_request message) {
+void MicroserviceController::handlePatch(http_request message) 
+{
     message.reply(status_codes::NotImplemented, responseNotImpl(methods::PATCH));
 }
 
@@ -143,59 +69,9 @@ void MicroserviceController::handlePut(http_request message)
     auto requestPathStr =  requestPathString(message);
     TRACE("Request path: ", requestPathStr);
     
-    if (path.size() >= 2 && path[0] == "users") 
+    if (path.size() >= 2 && path[0] == "users" && std::stoi(path[1]) != 0) 
     {       
-        TRACE("headers.content_type: ", message.headers().content_type());
-        
-        std::string email = path[1];
-        TRACE("email: ", email);
-        //TRACE("request: ", message.extract_string().get());
-        
-        message.extract_json().then([=](json::value request) 
-        {
-            TRACE("0,5");
-            try 
-            {               
-                double weight = request.at("weight").as_double();
-                TRACE("weight: ", weight);
-
-                UserManager users;
-                bool result = users.setUserWeight(email, weight);
-                
-                json::value responseJson;
-                if (result)
-                {
-                    responseJson["message"] = json::value::string("succesful update!");
-                    http_response response(status_codes::OK);
-                    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
-                    response.set_body(responseJson);
-                    message.reply(response);
-                }
-                else 
-                {
-                    responseJson["message"] = json::value::string("unsuccesful update!");
-                    http_response response(status_codes::BadRequest);
-                    response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
-                    response.set_body(responseJson);
-                    message.reply(response);
-                }            
-            }
-            catch(UserManagerException & e) 
-            {
-                TRACE("UserManagerException: ", e.what());
-                message.reply(status_codes::BadRequest, e.what());
-            }
-            catch(json::json_exception & e) 
-            {
-                TRACE("json::json_exception: ", e.what());
-                message.reply(status_codes::BadRequest);
-            }
-            catch(...) 
-            {   
-                TRACE("Exception ...");
-                RuntimeUtils::printStackTrace();
-            }
-        });
+        handlePutUser(message, std::stoi(path[1]));
     }
     else
     {
@@ -220,7 +96,7 @@ void MicroserviceController::handleDelete(http_request message) {
 }
 
 void MicroserviceController::handleHead(http_request message) {
-    TRACE("MicroserviceController::handleOptions");
+    TRACE("MicroserviceController::handleHead");
     
     http_response response = prepareResponse(status_codes::OK);
     message.reply(response);
@@ -235,15 +111,18 @@ void MicroserviceController::handleOptions(http_request message)
    
 }
 
-void MicroserviceController::handleTrace(http_request message) {
+void MicroserviceController::handleTrace(http_request message) 
+{
     message.reply(status_codes::NotImplemented, responseNotImpl(methods::TRCE));
 }
 
-void MicroserviceController::handleConnect(http_request message) {
+void MicroserviceController::handleConnect(http_request message) 
+{
     message.reply(status_codes::NotImplemented, responseNotImpl(methods::CONNECT));
 }
 
-void MicroserviceController::handleMerge(http_request message) {
+void MicroserviceController::handleMerge(http_request message) 
+{
     message.reply(status_codes::NotImplemented, responseNotImpl(methods::MERGE));
 }
 
@@ -254,7 +133,7 @@ json::value MicroserviceController::responseNotImpl(const http::method & method)
     return response ;
 }
 
-json::value MicroserviceController::handleTest()
+void MicroserviceController::handleTest(http_request message)
 {
     auto currentTime = std::chrono::system_clock::now();
     auto response = json::value::object();
@@ -262,8 +141,8 @@ json::value MicroserviceController::handleTest()
     response["version"] = json::value::string("0.1.1");
     response["status"] = json::value::string("ready!");
     response["time"] = json::value::string(kj::timePointAsString(currentTime));
-    
-    return response;
+
+     message.reply(status_codes::OK, response);  
 }
 
 void MicroserviceController::handleUserSignUp(http_request message)
@@ -312,6 +191,85 @@ void MicroserviceController::handleUserSignUp(http_request message)
         {   
             TRACE("Exception ...");
             RuntimeUtils::printStackTrace();
+        }
+    });
+}
+
+void MicroserviceController::handleSignOn(http_request message)
+{
+    pplx::create_task([=]() -> std::tuple<bool, UserInformation> 
+    {
+        auto headers = message.headers();
+        if (message.headers().find("Authorization") == headers.end()) 
+        {    
+            throw std::exception();
+        }
+        
+        auto authHeader = headers["Authorization"];
+        TRACE("authHeader: ", authHeader);
+
+        auto credsPos = authHeader.find("Basic");
+        if (credsPos == std::string::npos) 
+        {    
+            throw std::exception();
+        }
+
+        auto base64 = authHeader.substr(credsPos + std::string("Basic").length() + 1);
+        if (base64.empty()) 
+        {
+            throw std::exception();
+        }
+
+        auto bytes = utility::conversions::from_base64(base64);
+        std::string creds(bytes.begin(), bytes.end());
+        TRACE("creds:" , creds);
+
+        auto colonPos = creds.find(":");
+        if (colonPos == std::string::npos) 
+        {
+            throw std::exception();
+        }
+        
+        auto useremail = creds.substr(0, colonPos);
+        auto password = creds.substr(colonPos + 1, creds.size() - colonPos - 1);            
+        TRACE("useremail: ", useremail, " password: ", password);    
+
+        UserManager users;
+        UserInformation userInfo;            
+        if (users.signOn(useremail, password, userInfo)) {
+            return std::make_tuple(true, userInfo);
+        }
+        else {
+            return std::make_tuple(false, UserInformation {});
+        }
+    })
+    .then([=](pplx::task<std::tuple<bool, UserInformation>> resultTsk) 
+    {
+        try 
+        {
+            auto result = resultTsk.get();
+            if (std::get<0>(result) == true) 
+            {
+                json::value response;
+                response["success"] = json::value::string("welcome " + std::get<1>(result).name + "!");                    
+                // message.reply(status_codes::OK, response);
+
+                http_response httpResponse = prepareResponse(status_codes::OK);
+                message.reply(httpResponse);
+
+            }
+            else 
+            {
+                //message.reply(status_codes::Unauthorized);
+                http_response httpResponse = prepareResponse(status_codes::Unauthorized);
+                message.reply(httpResponse);
+            }
+        }
+        catch(std::exception) 
+        {
+            //message.reply(status_codes::Unauthorized);
+            http_response httpResponse = prepareResponse(status_codes::Unauthorized);
+            message.reply(httpResponse);
         }
     });
 }
@@ -376,12 +334,67 @@ void MicroserviceController::handleGetUser(http_request message, int userId)
     }); 
 }
 
+void MicroserviceController::handlePutUser(http_request message, int userId)
+{
+    TRACE("headers.content_type: ", message.headers().content_type()); 
+    TRACE("userId: ", userId);
+    
+    message.extract_json().then([=](json::value request) 
+    {
+        try 
+        {   
+            std::string name = request.at("name").as_string(); 
+            std::string lastName = request.at("lastName").as_string(); 
+            double weight = request.at("weight").as_double();
+            
+
+            TRACE("name: ", name, " lastName: ", lastName, " weight: ", weight);
+
+            UserManager users;
+            bool result = users.updateUser(userId, name, lastName, weight);
+            
+            json::value responseJson;
+            if (result)
+            {
+                responseJson["message"] = json::value::string("succesful update!");
+                http_response response(status_codes::OK);
+                response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+                response.set_body(responseJson);
+                message.reply(response);
+            }
+            else 
+            {
+                responseJson["message"] = json::value::string("unsuccesful update!");
+                http_response response(status_codes::BadRequest);
+                response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+                response.set_body(responseJson);
+                message.reply(response);
+            }            
+        }
+        catch(UserManagerException & e) 
+        {
+            TRACE("UserManagerException: ", e.what());
+            message.reply(status_codes::BadRequest, e.what());
+        }
+        catch(json::json_exception & e) 
+        {
+            TRACE("json::json_exception: ", e.what());
+            message.reply(status_codes::BadRequest);
+        }
+        catch(...) 
+        {   
+            TRACE("Exception ...");
+            RuntimeUtils::printStackTrace();
+        }
+    });
+}
+
 web::http::http_response MicroserviceController::prepareResponse(http::status_code code)
 {
     http_response response(code);
     response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
     response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
-    response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
+    response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, PUT, OPTIONS"));
     response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type, Authorization"));  
 
     return response; 

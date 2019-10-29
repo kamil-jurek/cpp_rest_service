@@ -48,13 +48,37 @@ bool UserManager::setUserWeight(const std::string email, double weight)
    return false;
 }
 
+bool UserManager::updateUser(unsigned int userId, 
+                             const std::string name, 
+                             const std::string lastName, 
+                             double weight)
+{
+   TRACE("UserManager::updateUserWeight() userId:", 
+          userId, " name:", name, " lastName:", lastName, "weight: ", weight);
+   
+   for(auto& emailUserInfoPair : usersDB)
+   {
+      if (emailUserInfoPair.second.userId == userId)
+      {  
+         std::unique_lock<std::mutex> lock { usersDBMutex };
+         emailUserInfoPair.second.name = name;
+         emailUserInfoPair.second.lastName = lastName;
+         emailUserInfoPair.second.weight = weight;
+
+         return true;
+      }    
+   }
+
+   return false;
+}
+
 std::vector<UserInformation> UserManager::getUsers()
 {
    TRACE("UserManager::getUsers()");
    std::vector<UserInformation> users;
-   for(auto const& kv : usersDB)
+   for(auto const& emailUserInfoPair : usersDB)
    {
-      users.push_back(kv.second);
+      users.push_back(emailUserInfoPair.second);
    }
 
    return users;
@@ -64,11 +88,11 @@ UserInformation UserManager::getUser(unsigned int userId)
 {
    TRACE("UserManager::getUser(userId:", userId, ")");
    UserInformation user;
-   for(auto const& kv : usersDB)
+   for(auto const& emailUserInfoPair : usersDB)
    {
-      if (kv.second.userId == userId)
+      if (emailUserInfoPair.second.userId == userId)
       {  
-         user = kv.second;
+         user = emailUserInfoPair.second;
       }    
    }
 

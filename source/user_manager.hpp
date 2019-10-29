@@ -38,6 +38,11 @@ class UserManager
 
    bool setUserWeight(const std::string email, double weight);
 
+   bool updateUser(unsigned int userId, 
+                   const std::string name, 
+                   const std::string lastName, 
+                   double weight);
+
    UserInformation getUser(unsigned int userId);
 
    std::vector<UserInformation> getUsers();
