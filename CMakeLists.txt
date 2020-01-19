@@ -9,6 +9,10 @@ if(UNIX)
 
     find_package(OpenSSL 1.0.1 REQUIRED)
     set(OPENSSL_VERSION "1.0.1")
+
+    find_package(libmongocxx REQUIRED)
+    find_package(libbsoncxx REQUIRED)
+
 else()
     message(FATAL_ERROR "-- Unsupported platform sorry! :( ")
 endif()
@@ -30,19 +34,31 @@ add_executable(${PROJECT_NAME} ./source/main.cpp
                                ./source/microsvc_controller.cpp
                                ./source/user_manager.cpp
                                ./source/foundation/network_utils.cpp
-                               ./source/foundation/basic_controller.cpp)
+                               ./source/foundation/basic_controller.cpp
+                               ./source/db_manager.cpp)
 
 # headers search paths ...
 set(CPPRESTSDK_INCLUDE_DIR "./libs/cpprestsdk/Release/include")
 set(MICROSERVICE_INCLUDE_DIR "./source/foundation/include")
 message(MICROSERVICE " ${MICROSERVICE_INCLUDE_DIR}")
-set(HEADER_SEARCH_PATHS ${CPPRESTSDK_INCLUDE_DIR} ${MICROSERVICE_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR})
+set(HEADER_SEARCH_PATHS ${CPPRESTSDK_INCLUDE_DIR} 
+                        ${MICROSERVICE_INCLUDE_DIR} 
+                        ${Boost_INCLUDE_DIR} 
+                        ${OPENSSL_INCLUDE_DIR}
+                        ${LIBMONGOCXX_INCLUDE_DIRS}
+                        ${LIBBSONCXX_INCLUDE_DIRS}}
+                        )
 
 # library search paths ...
 set(OPENSSL_LIBS "${OPENSSL_LIBRARIES}")
 set(CPPRESTSDK_LIBRARY "${PROJECT_SOURCE_DIR}/libs/cpprestsdk/build.release/Binaries/libcpprest.a")
 
-set(LIBRARIES_SEARCH_PATHS ${CPPRESTSDK_LIBRARY} ${OPENSSL_LIBS} ${Boost_LIBRARIES})
+set(LIBRARIES_SEARCH_PATHS ${CPPRESTSDK_LIBRARY} 
+                           ${OPENSSL_LIBS} 
+                           ${Boost_LIBRARIES}
+                           ${LIBMONGOCXX_LIBRARIES}
+                           ${LIBBSONCXX_LIBRARIES}
+                           )
 
 message(BOOST_LIBS " ${Boost_LIBRARIES}")
 message(OPENSSL_LIBS " ${OPENSSL_LIBRARIES}")
@@ -51,5 +67,6 @@ message(LIBRARIES_SEARCH_PATHS " ${LIBRARIES_SEARCH_PATHS}")
 
 include_directories(${HEADER_SEARCH_PATHS})
 
-target_link_libraries(${PROJECT_NAME} ${LIBRARIES_SEARCH_PATHS})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${LIBMONGOCXX_DEFINITIONS})
 
+target_link_libraries(${PROJECT_NAME} ${LIBRARIES_SEARCH_PATHS})

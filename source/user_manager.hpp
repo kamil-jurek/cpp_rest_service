@@ -10,6 +10,7 @@ typedef struct
    std::string password;
    std::string name;
    std::string lastName;
+   std::string date;
    double weight;   
 
 } UserInformation;
@@ -41,6 +42,7 @@ class UserManager
    bool updateUser(unsigned int userId, 
                    const std::string name, 
                    const std::string lastName, 
+                   const std::string date,
                    double weight);
 
    UserInformation getUser(unsigned int userId);

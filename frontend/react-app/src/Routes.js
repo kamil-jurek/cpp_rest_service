@@ -6,6 +6,7 @@ import Login from "./containers/Login";
 import Signup from "./containers/Signup";
 import Users from "./containers/Users";
 import User from "./containers/User";
+import Galery from "./containers/Galery";
 import AppliedRoute from "./components/AppliedRoute";
 
 export default function Routes({ appProps }) {
@@ -16,6 +17,7 @@ export default function Routes({ appProps }) {
       <AppliedRoute path="/signup" exact component={Signup} appProps={appProps} />
       <AppliedRoute path="/users" exact component={Users} appProps={appProps} />
       <AppliedRoute path="/users/:id" exact component={User} appProps={appProps} />
+      <AppliedRoute path="/galery" exact component={Galery} appProps={appProps} />
       <Route component={NotFound} />
     </Switch>
   );

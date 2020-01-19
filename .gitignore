@@ -1,4 +1,4 @@
-CMakeCache.txt
+gsCMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
@@ -9,4 +9,7 @@ compile_commands.json
 CTestTestfile.cmake
 build
 libs/cpprestsdk/
+libs/mongo-c-driver/
+libs/mongo-cxx-driver/
 frontend/react-app/node_modules
+node_modules

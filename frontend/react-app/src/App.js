@@ -42,6 +42,9 @@ function App(props) {
             <LinkContainer to="/users">
               <NavItem>Users</NavItem>
             </LinkContainer>
+            <LinkContainer to="/galery">
+              <NavItem>Galery</NavItem>
+            </LinkContainer>
             {isAuthenticated
               ? <NavItem onClick={handleLogout}>Logout</NavItem>
               : <React.Fragment>

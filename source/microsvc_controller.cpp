@@ -13,6 +13,7 @@
 using namespace web;
 using namespace http;
 
+//  Register the handlers on the Controller interface
 void MicroserviceController::initRestOpHandlers() 
 {
     listener.support(methods::GET, std::bind(&MicroserviceController::handleGet, this, std::placeholders::_1));
@@ -161,6 +162,7 @@ void MicroserviceController::handleUserSignUp(http_request message)
                 request.at("password").as_string(),
                 request.at("name").as_string(),
                 request.at("lastName").as_string(),
+                "",
                 0.0
             };
             
@@ -294,6 +296,7 @@ void MicroserviceController::handleGetUsers(http_request message)
             user["lastName"] = json::value::string(userDb.lastName); 
             user["weight"] = json::value::number(userDb.weight); 
             user["userId"] = json::value::number(userDb.userId); 
+            user["date"] = json::value::string(userDb.date);
 
             users.push_back(user);
         }
@@ -324,6 +327,7 @@ void MicroserviceController::handleGetUser(http_request message, int userId)
         responseJson["lastName"] = json::value::string(userDb.lastName); 
         responseJson["weight"] = json::value::number(userDb.weight); 
         responseJson["userId"] = json::value::number(userDb.userId); 
+        responseJson["date"] = json::value::string(userDb.date);
 
         // message.reply(status_codes::OK, response);  
         http_response response(status_codes::OK);
@@ -345,13 +349,14 @@ void MicroserviceController::handlePutUser(http_request message, int userId)
         {   
             std::string name = request.at("name").as_string(); 
             std::string lastName = request.at("lastName").as_string(); 
+            std::string date = request.at("date").as_string();
             double weight = request.at("weight").as_double();
             
 
-            TRACE("name: ", name, " lastName: ", lastName, " weight: ", weight);
+            TRACE("name: ", name, " lastName: ", lastName, " date: ", date, " weight: ", weight);
 
             UserManager users;
-            bool result = users.updateUser(userId, name, lastName, weight);
+            bool result = users.updateUser(userId, name, lastName, date, weight);
             
             json::value responseJson;
             if (result)

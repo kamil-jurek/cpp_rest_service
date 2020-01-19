@@ -36,6 +36,7 @@ export default function Home(props) {
         <ListGroupItem>
           <p>
             {"weight: " + user.weight}
+            {"\t"}
             {"email: " + user.email}          
           </p>
         </ListGroupItem>

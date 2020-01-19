@@ -6,11 +6,16 @@
 #include "microsvc_controller.hpp"
 #include "kj_utils.hpp"
 
+#include "db_manager.hpp"
+
 using namespace web;
 using namespace kj;
 
 int main() 
-{
+{   
+    DbManager dbManager;
+    dbManager.createDocumemt();
+
     InterruptHandler::hookSIGINT();
 
     MicroserviceController server;

@@ -9,6 +9,7 @@ export default function User(props) {
     const [userId, setUserId] = useState(0);
     const [lastName, setLastName] = useState("");
     const [weight, setWeight] = useState(0.0);
+    const [date, setDate] = useState("30-10-2019");
 
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -25,6 +26,7 @@ export default function User(props) {
                 setWeight(user.weight);
                 setEmail(user.email);
                 setUserId(user.userId);
+                setDate(user.date);
 
         });   
     }
@@ -46,7 +48,8 @@ export default function User(props) {
         body: JSON.stringify({ 
             "name": name, 
             "lastName": lastName,
-            "weight": parseFloat(weight)
+            "weight": parseFloat(weight),
+            "date": date,
         }),    
     }).then(res => {
         setIsLoading(false);
@@ -73,23 +76,24 @@ export default function User(props) {
   return (
     <div className="User">
         {user && (
-            <div className="">
-             <table className="UsersTable">
-             <thead>
+          <div className="">
+            <table className="UsersTable">
+            <thead>
               <tr>
                 <th>UserId</th>
                 <th>Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
                 <th>Weight</th>
+                <th>Date</th>
               </tr>
              </thead>
             <tbody>
-                <tr className='userRow' >
-                  <td>
+              <tr className='userRow' >
+                <td>
                    {userId}                
-                  </td>  
-                  <td>
+                </td>  
+                <td>
                   <form>
                     <FormGroup controlId="name">
                         <FormControl
@@ -98,9 +102,9 @@ export default function User(props) {
                             onChange={e => setName(e.target.value)}
                         />
                     </FormGroup>
-                    </form>
-                  </td>
-                  <td>
+                  </form>
+                </td>
+                <td>
                   <form>
                     <FormGroup controlId="lastName">
                         <FormControl
@@ -109,9 +113,9 @@ export default function User(props) {
                             onChange={e => setLastName(e.target.value)}
                         />
                     </FormGroup>
-                    </form>
-                  </td>
-                  <td>
+                  </form>
+                </td>
+                <td>
                   {email}
                   </td>
                   <td>
@@ -125,6 +129,17 @@ export default function User(props) {
                     </FormGroup>
                     </form>
                   </td>
+                            
+                <td>
+                    <FormGroup controlId="date">
+                        <FormControl
+                            value={date}
+                            type="date"
+                            onChange={e => setDate(e.target.value)}
+                        />
+                        </FormGroup>
+                   
+                </td>
                 </tr> 
                 <tr className='userRow'>
                     <td>{userId}</td>  
@@ -132,12 +147,12 @@ export default function User(props) {
                     <td>{lastName}</td>
                     <td>{email}</td>
                     <td>{weight}</td>
-                </tr>                
-            
-
+                    <td>{date}</td>
+                </tr>    
                 <tr className='' >
                   <td>
         <form onSubmit={handleSubmit}>    
+            
             <LoaderButton
                 block
                 type="submit"

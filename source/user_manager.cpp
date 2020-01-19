@@ -51,10 +51,11 @@ bool UserManager::setUserWeight(const std::string email, double weight)
 bool UserManager::updateUser(unsigned int userId, 
                              const std::string name, 
                              const std::string lastName, 
+                             const std::string date,
                              double weight)
 {
    TRACE("UserManager::updateUserWeight() userId:", 
-          userId, " name:", name, " lastName:", lastName, "weight: ", weight);
+          userId, " name:", name, " lastName:", lastName, " date:", date, "weight: ", weight);
    
    for(auto& emailUserInfoPair : usersDB)
    {
@@ -63,6 +64,7 @@ bool UserManager::updateUser(unsigned int userId,
          std::unique_lock<std::mutex> lock { usersDBMutex };
          emailUserInfoPair.second.name = name;
          emailUserInfoPair.second.lastName = lastName;
+         emailUserInfoPair.second.date = date;
          emailUserInfoPair.second.weight = weight;
 
          return true;
