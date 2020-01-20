@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <basic_controller.hpp>
+#include "db_manager.hpp"
 
 using namespace kj;
 
@@ -22,6 +23,11 @@ public:
     void handleMerge(http_request message) override;
     void initRestOpHandlers() override;    
 
+    void setDbManager(DbManager* db)
+    {
+        this->dbManager = db;
+    }
+
 private:
     static json::value responseNotImpl(const http::method& method);
     void handleTest(http_request message);
@@ -32,4 +38,9 @@ private:
     void handlePutUser(http_request message, int userId);
 
     web::http::http_response prepareResponse(http::status_code code);
+
+    
+
+    DbManager* dbManager;
+
 };

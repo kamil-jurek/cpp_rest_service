@@ -14,13 +14,16 @@ using namespace kj;
 int main() 
 {   
     DbManager dbManager;
-    dbManager.createDocumemt();
+    // dbManager.createDocumemt();
+
+    //dbManager.getUser(1002);
 
     InterruptHandler::hookSIGINT();
 
     MicroserviceController server;
     server.setEndpoint("http://host_auto_ip4:6502/kj/api");
-    
+    server.setDbManager(&dbManager);
+
     try 
     {
         // wait for server initialization...

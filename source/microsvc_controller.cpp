@@ -166,9 +166,10 @@ void MicroserviceController::handleUserSignUp(http_request message)
                 0.0
             };
             
-            UserManager users;
-            users.signUp(userInfo);
-            
+            //UserManager users;
+            //users.signUp(userInfo);
+            dbManager->signUp(userInfo);
+
             json::value responseJson;
             responseJson["message"] = json::value::string("succesful registration!");
             
@@ -236,9 +237,9 @@ void MicroserviceController::handleSignOn(http_request message)
         auto password = creds.substr(colonPos + 1, creds.size() - colonPos - 1);            
         TRACE("useremail: ", useremail, " password: ", password);    
 
-        UserManager users;
+        // UserManager users;
         UserInformation userInfo;            
-        if (users.signOn(useremail, password, userInfo)) {
+        if (dbManager->signOn(useremail, password, userInfo)) {
             return std::make_tuple(true, userInfo);
         }
         else {
@@ -285,9 +286,9 @@ void MicroserviceController::handleGetUsers(http_request message)
     {
         auto responseJson = json::value::object();
         std::vector<web::json::value> users;
-        UserManager userManager;
-
-        auto usersVector = userManager.getUsers();
+        //UserManager userManager;
+        auto usersVector = dbManager->getUsers();
+       // auto usersVector = userManager.getUsers();
         for(auto const& userDb : usersVector)
         {
             json::value user;
@@ -319,9 +320,9 @@ void MicroserviceController::handleGetUser(http_request message, int userId)
     pplx::create_task([=]() 
     {
         auto responseJson = json::value::object();
-        UserManager userManager;
-
-        auto userDb = userManager.getUser(userId);         
+        // UserManager userManager;
+        auto userDb = dbManager->getUser(userId);
+        // auto userDb = userManager.getUser(userId);         
         responseJson["email"] = json::value::string(userDb.email);
         responseJson["name"] = json::value::string(userDb.name);
         responseJson["lastName"] = json::value::string(userDb.lastName); 
